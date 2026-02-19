@@ -1,0 +1,33 @@
+{
+    "name": "desierai-desktop",
+    "version": "1.0.0",
+    "description": "DesierAI – Screen-share-safe interview assistant",
+    "main": "main.js",
+    "scripts": {
+        "start": "electron .",
+        "dev": "electron . --dev",
+        "build": "electron-builder"
+    },
+    "build": {
+        "appId": "com.desier.desktop",
+        "productName": "DesierAI",
+        "directories": {
+            "output": "dist"
+        },
+        "mac": {
+            "category": "public.app-category.productivity",
+            "target": [
+                "dmg",
+                "zip"
+            ]
+        },
+        "files": [
+            "**/*",
+            "!dist/*"
+        ]
+    },
+    "devDependencies": {
+        "electron": "^29.0.0",
+        "electron-builder": "^24.13.3"
+    }
+}

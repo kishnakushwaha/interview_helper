@@ -1,0 +1,28 @@
+# OS
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+interw/
+backend/interw/
+*.env
+
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Electron / Build
+dist/
+release/
+build/
+*.dmg
+*.zip
+*.app
+
+# Editors
+.vscode/
+.idea/

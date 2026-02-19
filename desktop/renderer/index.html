@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DesierAI</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+    <!-- Draggable title bar -->
+    <div class="titlebar">
+        <span class="titlebar-text">✦ DesierAI</span>
+        <span class="titlebar-hint">Cmd+Shift+D to hide</span>
+    </div>
+
+    <!-- Login View -->
+    <div id="view-login">
+        <div class="section">
+            <h3>🔐 Login</h3>
+            <input type="email" id="login-email" placeholder="Email" autocomplete="email" />
+            <input type="password" id="login-password" placeholder="Password" autocomplete="current-password" />
+            <button id="btn-login" onclick="handleLogin()">Login</button>
+            <p class="error-msg hidden" id="login-error"></p>
+        </div>
+    </div>
+
+    <!-- Main View (after login) -->
+    <div id="view-main" class="hidden">
+        <div class="section">
+            <div style="display:flex;gap:8px;">
+                <input type="text" id="input-role" placeholder="Job Role (optional)" style="flex:1" />
+                <select id="input-level"
+                    style="flex:0 0 100px; padding:9px 8px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); border-radius:10px; color:#f1f5f9; font-family:inherit; font-size:0.85rem;">
+                    <option value="">Auto</option>
+                    <option value="junior">Junior</option>
+                    <option value="mid">Mid</option>
+                    <option value="senior">Senior</option>
+                </select>
+            </div>
+            <textarea id="input-question" rows="3" placeholder="Paste interviewer's question..."></textarea>
+            <button id="btn-ask" onclick="askQuestion()">⚡ Get Answer</button>
+            <p class="error-msg hidden" id="ask-error"></p>
+        </div>
+
+        <!-- Answer display -->
+        <div id="answer-area" class="hidden">
+            <div class="answer-section">
+                <div class="answer-header">
+                    <span class="label">Your Answer</span>
+                    <button class="copy-btn" onclick="copyAnswer()">📋</button>
+                </div>
+                <p id="answer-text"></p>
+            </div>
+
+            <!-- Code block (coding questions only) -->
+            <div id="code-section" class="hidden" style="padding:0 14px; margin-top: 8px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                    <span class="label">💻 <span id="code-lang">CODE</span></span>
+                    <button class="copy-btn" onclick="copyCode()">📋</button>
+                </div>
+                <pre
+                    style="background:rgba(0,0,0,0.5); border-radius:10px; padding:12px 14px; overflow-x:auto; font-size:0.8rem; line-height:1.6; font-family:'SF Mono','Fira Code',monospace; color:#e2e8f0; border:1px solid rgba(255,255,255,0.06); white-space:pre; margin:0;"><code id="code-text"></code></pre>
+            </div>
+
+            <div class="extras-row">
+                <div class="extra-card">
+                    <h4>🎯 Key Points</h4>
+                    <ul id="key-points"></ul>
+                </div>
+                <div class="extra-card">
+                    <h4>💡 Tip</h4>
+                    <p id="tip-text"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>

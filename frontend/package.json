@@ -1,0 +1,5 @@
+{
+    "name": "desier-ai-frontend",
+    "version": "1.0.0",
+    "description": "DesierAI – AI Interview Prep frontend (vanilla HTML/CSS/JS, no build step)"
+}

@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DesierAI – AI Interview Prep</title>
+    <meta name="description"
+        content="AI-powered interview preparation platform. Upload your resume, practice mock interviews, and get instant AI feedback." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="src/style.css" />
+</head>
+
+<body>
+    <!-- ═══════ NAV ═══════ -->
+    <nav id="main-nav" class="glass-nav hidden">
+        <div class="nav-inner">
+            <a href="#" class="logo" onclick="navigate('dashboard')">
+                <span class="logo-icon">✦</span> DesierAI
+            </a>
+            <div class="nav-links">
+                <a href="#" onclick="navigate('dashboard')" id="nav-dashboard">Dashboard</a>
+                <a href="#" onclick="navigate('resume')" id="nav-resume">Resume</a>
+                <a href="#" onclick="navigate('interview')" id="nav-interview">Interview</a>
+                <a href="#" onclick="navigate('live')" id="nav-live">⚡ Live Assist</a>
+                <a href="#" onclick="navigate('history')" id="nav-history">History</a>
+            </div>
+            <button class="btn btn-ghost btn-sm" onclick="logout()" id="nav-logout">Logout</button>
+        </div>
+    </nav>
+
+    <!-- ═══════ AUTH PAGE ═══════ -->
+    <div id="page-auth" class="page">
+        <div class="auth-wrapper">
+            <div class="auth-hero">
+                <div class="hero-glow"></div>
+                <h1><span class="logo-icon-lg">✦</span> DesierAI</h1>
+                <p class="tagline">AI-Powered Interview Preparation</p>
+                <p class="hero-desc">Upload your resume. Practice mock interviews.<br />Get instant AI feedback.</p>
+            </div>
+            <div class="auth-card glass-card">
+                <div class="auth-tabs">
+                    <button class="tab active" id="tab-login" onclick="switchAuthTab('login')">Login</button>
+                    <button class="tab" id="tab-signup" onclick="switchAuthTab('signup')">Sign Up</button>
+                </div>
+                <!-- Login form -->
+                <form id="form-login" onsubmit="handleLogin(event)">
+                    <div class="input-group">
+                        <label for="login-email">Email</label>
+                        <input type="email" id="login-email" placeholder="you@example.com" required />
+                    </div>
+                    <div class="input-group">
+                        <label for="login-password">Password</label>
+                        <input type="password" id="login-password" placeholder="••••••••" required />
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full" id="btn-login">
+                        <span class="btn-text">Login</span>
+                        <span class="btn-loader hidden"></span>
+                    </button>
+                    <p class="auth-error hidden" id="login-error"></p>
+                </form>
+                <!-- Signup form -->
+                <form id="form-signup" class="hidden" onsubmit="handleSignup(event)">
+                    <div class="input-group">
+                        <label for="signup-email">Email</label>
+                        <input type="email" id="signup-email" placeholder="you@example.com" required />
+                    </div>
+                    <div class="input-group">
+                        <label for="signup-password">Password</label>
+                        <input type="password" id="signup-password" placeholder="••••••••" minlength="6" required />
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full" id="btn-signup">
+                        <span class="btn-text">Create Account</span>
+                        <span class="btn-loader hidden"></span>
+                    </button>
+                    <p class="auth-error hidden" id="signup-error"></p>
+                    <p class="auth-success hidden" id="signup-success"></p>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════ DASHBOARD ═══════ -->
+    <div id="page-dashboard" class="page hidden">
+        <div class="page-content">
+            <header class="page-header">
+                <h2>Welcome back! 👋</h2>
+                <p id="user-email-display" class="subtitle"></p>
+            </header>
+            <div class="dashboard-grid">
+                <!-- Resume card -->
+                <div class="dash-card glass-card">
+                    <div class="dash-card-icon">📄</div>
+                    <h3>Resume</h3>
+                    <p id="resume-status-text">Checking...</p>
+                    <div class="dash-card-actions">
+                        <button class="btn btn-primary btn-sm" onclick="navigate('resume')">
+                            <span id="resume-action-text">Upload</span>
+                        </button>
+                    </div>
+                </div>
+                <!-- Interview card -->
+                <div class="dash-card glass-card">
+                    <div class="dash-card-icon">🎤</div>
+                    <h3>Mock Interview</h3>
+                    <p>Practice with AI-generated questions</p>
+                    <div class="dash-card-actions">
+                        <button class="btn btn-primary btn-sm" onclick="navigate('interview')" id="start-interview-btn">
+                            Start Interview
+                        </button>
+                    </div>
+                </div>
+                <!-- History card -->
+                <div class="dash-card glass-card">
+                    <div class="dash-card-icon">📊</div>
+                    <h3>History</h3>
+                    <p id="history-count-text">Loading...</p>
+                    <div class="dash-card-actions">
+                        <button class="btn btn-primary btn-sm" onclick="navigate('history')">View All</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════ RESUME UPLOAD ═══════ -->
+    <div id="page-resume" class="page hidden">
+        <div class="page-content">
+            <header class="page-header">
+                <h2>📄 Resume Upload</h2>
+                <p class="subtitle">Upload your PDF resume for AI analysis</p>
+            </header>
+            <div class="upload-zone glass-card" id="upload-zone">
+                <div class="upload-icon">⬆️</div>
+                <p class="upload-title">Drag & drop your resume here</p>
+                <p class="upload-subtitle">or click to browse (PDF only, max 10 MB)</p>
+                <input type="file" id="resume-file-input" accept=".pdf" class="hidden"
+                    onchange="handleFileSelect(event)" />
+                <button class="btn btn-primary" onclick="document.getElementById('resume-file-input').click()">
+                    Choose PDF
+                </button>
+            </div>
+            <div id="upload-progress" class="hidden">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="upload-progress-fill"></div>
+                </div>
+                <p id="upload-status-text" class="upload-status">Uploading...</p>
+            </div>
+            <div id="upload-result" class="hidden glass-card result-card">
+                <div class="result-icon">✅</div>
+                <h3>Resume Processed!</h3>
+                <p id="upload-result-text"></p>
+                <button class="btn btn-primary" onclick="navigate('interview')">Start Interview →</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════ INTERVIEW ═══════ -->
+    <div id="page-interview" class="page hidden">
+        <div class="page-content">
+            <!-- Setup -->
+            <div id="interview-setup">
+                <header class="page-header">
+                    <h2>🎤 Mock Interview</h2>
+                    <p class="subtitle">Get AI-generated interview questions based on your resume</p>
+                </header>
+                <div class="glass-card setup-card">
+                    <div class="input-group">
+                        <label for="job-role-input">Target Job Role</label>
+                        <input type="text" id="job-role-input" placeholder="e.g. Senior Data Scientist" required />
+                    </div>
+                    <div class="input-group">
+                        <label for="num-questions-input">Number of Questions</label>
+                        <select id="num-questions-input">
+                            <option value="3">3 questions</option>
+                            <option value="5" selected>5 questions</option>
+                            <option value="7">7 questions</option>
+                            <option value="10">10 questions</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary btn-full" onclick="startInterview()" id="btn-start-interview">
+                        <span class="btn-text">Generate Questions</span>
+                        <span class="btn-loader hidden"></span>
+                    </button>
+                    <p class="auth-error hidden" id="interview-error"></p>
+                </div>
+            </div>
+
+            <!-- Live interview -->
+            <div id="interview-live" class="hidden">
+                <div class="interview-header">
+                    <div class="interview-progress">
+                        <span id="question-counter">Question 1 / 5</span>
+                        <div class="progress-bar progress-bar-sm">
+                            <div class="progress-fill" id="interview-progress-fill"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="glass-card question-card">
+                    <p class="question-label">Question</p>
+                    <h3 id="current-question-text" class="question-text"></h3>
+                    <div class="input-group">
+                        <label for="answer-textarea">Your Answer</label>
+                        <textarea id="answer-textarea" rows="6" placeholder="Type your answer here..."></textarea>
+                    </div>
+                    <button class="btn btn-primary btn-full" onclick="submitAnswer()" id="btn-submit-answer">
+                        <span class="btn-text">Submit Answer</span>
+                        <span class="btn-loader hidden"></span>
+                    </button>
+                </div>
+
+                <!-- Feedback -->
+                <div id="feedback-section" class="hidden">
+                    <div class="glass-card feedback-card">
+                        <div class="feedback-header">
+                            <div class="score-badge" id="score-badge">0</div>
+                            <span class="score-label">/ 10</span>
+                        </div>
+                        <div class="feedback-body">
+                            <div class="feedback-item">
+                                <h4>💬 Feedback</h4>
+                                <p id="feedback-text"></p>
+                            </div>
+                            <div class="feedback-item">
+                                <h4>💡 Improvement</h4>
+                                <p id="improvement-text"></p>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" onclick="nextQuestion()" id="btn-next-question">
+                            Next Question →
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Completed -->
+            <div id="interview-complete" class="hidden">
+                <div class="glass-card result-card complete-card">
+                    <div class="result-icon">🎉</div>
+                    <h3>Interview Complete!</h3>
+                    <p>You answered <span id="total-answered">0</span> questions</p>
+                    <p>Average score: <strong id="avg-score">0</strong> / 10</p>
+                    <div class="complete-actions">
+                        <button class="btn btn-primary" onclick="resetInterview()">Start New Interview</button>
+                        <button class="btn btn-ghost" onclick="navigate('dashboard')">Back to Dashboard</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════ HISTORY ═══════ -->
+    <div id="page-history" class="page hidden">
+        <div class="page-content">
+            <!-- Session List View -->
+            <div id="history-list-view">
+                <header class="page-header">
+                    <h2>📊 Interview History</h2>
+                    <p class="subtitle">Review your past interview sessions and feedback</p>
+                </header>
+                <div id="history-list" class="history-list"></div>
+            </div>
+
+            <!-- Session Detail View -->
+            <div id="history-detail-view" class="hidden">
+                <button class="back-btn" onclick="backToHistoryList()">← Back to History</button>
+                <div class="session-header">
+                    <h2 id="session-detail-title">Session Details</h2>
+                    <span class="role-tag" id="session-detail-role"></span>
+                    <p class="date-tag" id="session-detail-date"></p>
+                </div>
+                <div id="session-qa-list" class="qa-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════ LIVE ASSIST ═══════ -->
+    <div id="page-live" class="page hidden">
+        <div class="page-content">
+            <header class="page-header">
+                <h2>⚡ Live Assist</h2>
+                <p class="subtitle">Paste the interviewer's question — get an instant AI-powered answer</p>
+            </header>
+
+            <div class="live-input-section glass-card">
+
+                <div class="live-input-row">
+                    <div class="input-group" style="flex:1">
+                        <label for="live-role-input">Job Role (optional)</label>
+                        <input type="text" id="live-role-input" placeholder="e.g. Data Scientist" />
+                    </div>
+                    <div class="input-group" style="flex:0 0 160px">
+                        <label for="live-level-input">Interview Level</label>
+                        <select id="live-level-input">
+                            <option value="">Auto</option>
+                            <option value="junior">Junior</option>
+                            <option value="mid">Mid-Level</option>
+                            <option value="senior">Senior</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label for="live-question-input">Interviewer's Question</label>
+                    <textarea id="live-question-input" rows="3"
+                        placeholder="Paste or type the question here..."></textarea>
+                </div>
+                <button class="btn btn-primary btn-full" onclick="getLiveAnswer()" id="btn-live-answer">
+                    <span class="btn-text">⚡ Get Instant Answer</span>
+                    <span class="btn-loader hidden"></span>
+                </button>
+                <p class="auth-error hidden" id="live-error"></p>
+            </div>
+
+            <!-- Response area -->
+            <div id="live-response" class="hidden">
+                <div class="glass-card live-answer-card">
+                    <div class="live-answer-header">
+                        <span class="question-label">Your Answer</span>
+                        <button class="btn btn-ghost btn-sm" onclick="copyLiveAnswer()" id="btn-copy-answer">📋
+                            Copy</button>
+                    </div>
+                    <p id="live-answer-text" class="live-answer-text"></p>
+                </div>
+
+                <!-- Code block (shown only for coding questions) -->
+                <div id="live-code-section" class="hidden">
+                    <div class="glass-card live-code-card">
+                        <div class="live-answer-header">
+                            <span class="question-label">💻 Code — <span id="live-code-lang"></span></span>
+                            <button class="btn btn-ghost btn-sm" onclick="copyLiveCode()">📋 Copy Code</button>
+                        </div>
+                        <pre class="code-block"><code id="live-code-text"></code></pre>
+                    </div>
+                </div>
+
+                <div class="live-extras">
+                    <div class="glass-card live-extra-card">
+                        <h4>🎯 Key Points to Mention</h4>
+                        <ul id="live-key-points"></ul>
+                    </div>
+                    <div class="glass-card live-extra-card">
+                        <h4>💡 Delivery Tip</h4>
+                        <p id="live-tip"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════ TOAST ═══════ -->
+    <div id="toast-container"></div>
+
+    <script src="src/app.js"></script>
+</body>
+
+</html>
