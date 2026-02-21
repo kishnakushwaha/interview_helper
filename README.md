@@ -54,12 +54,19 @@ npm install
 npm start
 ```
 
-### 3. Build for Distribution (macOS)
-To create a standalone `.dmg` app:
+### 3. Build for Distribution
+**macOS (.dmg):**
 ```bash
 cd desktop
 npm run build
 # Output: desktop/dist/DesierAI-1.0.0-arm64.dmg
+```
+
+**Windows (.exe):**
+```bash
+cd desktop
+npm run build:win
+# Output: desktop/dist/DesierAI Setup 1.0.0.exe
 ```
 
 ## 🎮 Usage

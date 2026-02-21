@@ -39,8 +39,15 @@
                     <option value="senior">Senior</option>
                 </select>
             </div>
-            <textarea id="input-question" rows="3" placeholder="Paste interviewer's question..."></textarea>
-            <button id="btn-ask" onclick="askQuestion()">⚡ Get Answer</button>
+            <textarea id="input-question" rows="2" placeholder="Paste interviewer's question..."></textarea>
+            <div style="display:flex; gap:8px;">
+                <button id="btn-ask" onclick="askQuestion()" style="flex:2">⚡ Get Answer</button>
+                <button id="btn-voice" onclick="toggleVoiceMode()"
+                    style="flex:1; background:rgba(56,189,248,0.1); border:1px solid rgba(56,189,248,0.3); color:#38bdf8;">🎙️
+                    Voice Mode</button>
+            </div>
+            <p id="voice-status" style="font-size:0.75rem; color:#94a3b8; margin-top:4px; text-align:right;"
+                class="hidden"></p>
             <p class="error-msg hidden" id="ask-error"></p>
         </div>
 

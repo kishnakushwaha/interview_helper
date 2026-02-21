@@ -42,11 +42,13 @@ Return ONLY the JSON array, no markdown fences, no extra text."""
     )
 
     raw = response.choices[0].message.content.strip()
-    # Strip markdown fences if model adds them
-    if raw.startswith("```"):
-        raw = raw.split("\n", 1)[1]
-        raw = raw.rsplit("```", 1)[0]
-    return json.loads(raw)
+    # Strip markdown fences
+    if "```json" in raw:
+        raw = raw.split("```json")[1].split("```")[0].strip()
+    elif "```" in raw:
+        raw = raw.split("```")[1].split("```")[0].strip()
+    
+    return json.loads(raw, strict=False)
 
 
 def evaluate_answer(
@@ -81,10 +83,13 @@ Return ONLY the JSON object, no markdown fences, no extra text."""
     )
 
     raw = response.choices[0].message.content.strip()
-    if raw.startswith("```"):
-        raw = raw.split("\n", 1)[1]
-        raw = raw.rsplit("```", 1)[0]
-    return json.loads(raw)
+    # Strip markdown fences
+    if "```json" in raw:
+        raw = raw.split("```json")[1].split("```")[0].strip()
+    elif "```" in raw:
+        raw = raw.split("```")[1].split("```")[0].strip()
+    
+    return json.loads(raw, strict=False)
 
 
 def generate_live_answer(
@@ -108,10 +113,8 @@ def generate_live_answer(
             a = turn.get("answer", "")
             history_block += f"Q{i}: {q}\nA{i}: {a}\n\n"
 
-    prompt = f"""You are a brilliant interview coach sitting RIGHT BESIDE the candidate during a live interview.
-You can see everything. You are their "second brain" — calm, razor-sharp, and highly contextual.
-
-Your goal: Provide the PERFECT instantaneous answer to the current question, considering the entire conversation flow.
+    prompt = f"""You are a stealthy, highly technical AI assistant secretly helping a candidate during a live interview.
+Your absolute only purpose is to provide direct, factual, technical answers to interview questions and Provide the PERFECT instantaneous answer to the current question, considering the entire conversation flow.
 {role_hint}{level_hint}
 
 Resume:
@@ -119,34 +122,23 @@ Resume:
 {resume_context}
 \"\"\"
 {history_block}
-CURRENT QUESTION: {question}
+CURRENT QUESTION/AUDIO FRAGMENT: {question}
 
 ---
-CRITICAL INSTRUCTIONS FOR "HUMAN-LIKE" CONTEXT:
-1. **Analyze the Trajectory**: Look at the previous Q&As. Is the interviewer digging deeper into a specific topic? Are they testing edge cases?
-2. **Handle References**: If the question is "Can you optimize that?" or "Why did you use X?", REFER BACK to your previous answer immediately.
-   - Example: "As I used a hash map in the previous solution, we can optimize space by..."
-   - Do NOT say "I don't know what you're referring to". You have the history. Use it.
-3. **Consistency**: Ensure your new answer doesn't contradict your previous ones. Build upon them.
-4. **Auto-Detect Level**:
-   - Simple Q → Junior/Direct answer
-   - Complex/Abstract Q → Senior/Nuanced answer
-
-STYLE GUIDELINES (MANDATORY):
-- **Spoken Word ONLY**: Write exactly what the candidate should SAY. No "As I reflect..." or "In the context of...".
-- **Natural Flow**: Use "Well," "So," "Actually," to sound authentic.
-- **Concise Hints**: If the answer is long, give the *core concept* first, then details.
-- **No Essay Speak**: Avoid words like "Furthermore", "Moreover", "Consequently".
-- **Wingman Mode**: If the user is stuck, give them a lifeline ("You can mention X, Y, and Z").
----
+CRITICAL INSTRUCTIONS FOR LIVE DICTATION:
+1. **IGNORE HALLUCINATIONS**: Speech-to-text engines often hallucinate during silence. If the input is conversational filler (e.g., "Well, I'm ready", "I'm listening", "Thank you", "Hello", "How are you"), you MUST return an empty string for the answer. Do NOT reply conversationally.
+2. **ZERO CONVERSATION**: You are NOT a conversational chatbot. You are a technical knowledge base. Never say "Hello," "I'd be happy to explain," or "Great question." Start your answer immediately with the technical facts.
+3. **DIRECT & CONCISE**: Give the answer directly. No fluff. Write exactly what the candidate should say to sound like a senior engineer. 
+4. **Detect Incomplete Input**: If the question seems cut off mid-sentence, return "Waiting for interviewer to finish..." instead of trying to guess the answer.
+5. **No Hallucinated Experience**: Do NOT make up stories unless explicitly stated in the Resume.
 
 OUTPUT FORMAT (JSON ONLY):
 {{
-  "answer": "A natural, conversational script (2-4 sentences). strict spoken English.",
-  "key_points": ["Talking point 1", "Talking point 2"],
-  "tip": "Delivery advice (tone/speed/posture)",
-  "code": "Clean code snippet (if coding Q)",
-  "code_language": "python/js/sql/etc",
+  "answer": "Direct technical answer, no greeting or conversational filler. (Or empty string if hallucination)",
+  "key_points": ["Technical point 1", "Technical point 2"],
+  "tip": "Short delivery advice",
+  "code": "Code snippet if applicable",
+  "code_language": "python/js/etc",
   "detected_level": "easy/medium/hard"
 }}"""
 
@@ -158,10 +150,10 @@ OUTPUT FORMAT (JSON ONLY):
     )
 
     raw = response.choices[0].message.content.strip()
-    if raw.startswith("```"):
-        raw = raw.split("\n", 1)[1]
-        raw = raw.rsplit("```", 1)[0]
-    return json.loads(raw)
-
-
-
+    # Strip markdown fences
+    if "```json" in raw:
+        raw = raw.split("```json")[1].split("```")[0].strip()
+    elif "```" in raw:
+        raw = raw.split("```")[1].split("```")[0].strip()
+    
+    return json.loads(raw, strict=False)

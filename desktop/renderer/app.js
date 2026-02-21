@@ -11,6 +11,9 @@ const SUPABASE_ANON_KEY = "sb_publishable_iWcbs-0OGigM2j9kbYvSMQ_tKZFZUSZ";
 
 let accessToken = null;
 let liveSessionHistory = []; // Session memory
+let isVoiceModeActive = false;
+let mediaRecorder = null;
+let voiceCycleInterval = null;
 
 // ── Supabase Login ───────────────────────────────
 async function handleLogin() {
@@ -156,6 +159,164 @@ async function askQuestion() {
         btn.disabled = false;
         btn.textContent = "⚡ Get Answer";
     }
+}
+
+// ── Voice Mode ──────────────────────────────────
+async function toggleVoiceMode() {
+    const btn = document.getElementById("btn-voice");
+    const errorEl = document.getElementById("ask-error");
+    errorEl.classList.add("hidden");
+
+    if (isVoiceModeActive) {
+        stopVoiceMode();
+        return;
+    }
+
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        isVoiceModeActive = true;
+        btn.textContent = "🛑 Stop Listening";
+        btn.style.background = "rgba(220, 38, 38, 0.1)";
+        btn.style.borderColor = "#dc2626";
+        btn.style.color = "#ef4444";
+
+        document.getElementById("voice-status").classList.remove("hidden");
+        document.getElementById("voice-status").textContent = "🎙️ Mic Active";
+
+        startVoiceCycle(stream);
+    } catch (err) {
+        console.error("Mic access denied:", err);
+        errorEl.textContent = "Microphone access denied: " + err.message;
+        errorEl.classList.remove("hidden");
+    }
+}
+
+function stopVoiceMode() {
+    isVoiceModeActive = false;
+    const btn = document.getElementById("btn-voice");
+    btn.textContent = "🎙️ Voice Mode";
+    btn.style.background = "rgba(56,189,248,0.1)";
+    btn.style.borderColor = "rgba(56,189,248,0.3)";
+    btn.style.color = "#38bdf8";
+
+    document.getElementById("voice-status").classList.add("hidden");
+
+    if (mediaRecorder && mediaRecorder.state !== "inactive") {
+        mediaRecorder.stop();
+    }
+
+    if (voiceCycleInterval) {
+        clearInterval(voiceCycleInterval);
+    }
+}
+
+async function startVoiceCycle(stream) {
+    console.log("Starting voice cycle...");
+
+    const recordChunk = () => {
+        if (!isVoiceModeActive) return;
+
+        console.log("Recording chunk...");
+        document.getElementById("voice-status").textContent = "🎙️ Listening...";
+
+        const chunks = [];
+        const mimeType = ['audio/webm;codecs=opus', 'audio/webm', ''].find(m => m === '' || MediaRecorder.isTypeSupported(m));
+        mediaRecorder = new MediaRecorder(stream, mimeType ? { mimeType } : {});
+
+        mediaRecorder.ondataavailable = (e) => {
+            if (e.data.size > 0) chunks.push(e.data);
+        };
+
+        mediaRecorder.onstop = async () => {
+            console.log("Recording stopped. Chunk size:", chunks.length);
+            if (chunks.length > 0) {
+                const blob = new Blob(chunks, { type: "audio/webm" });
+                processVoiceChunk(blob);
+            }
+            if (isVoiceModeActive) {
+                setTimeout(recordChunk, 100);
+            }
+        };
+
+        mediaRecorder.start();
+        setTimeout(() => {
+            if (mediaRecorder && mediaRecorder.state === "recording") {
+                mediaRecorder.stop();
+            }
+        }, 8000); // 8 second chunks
+    };
+
+    recordChunk();
+}
+
+async function processVoiceChunk(blob) {
+    console.log("Uploading audio chunk...");
+    document.getElementById("voice-status").textContent = "📤 Analyzing...";
+
+    const formData = new FormData();
+    formData.append("file", blob, "chunk.webm");
+    formData.append("role", document.getElementById("input-role").value.trim());
+    formData.append("level", document.getElementById("input-level").value);
+    formData.append("history", JSON.stringify(liveSessionHistory));
+
+    try {
+        const res = await fetch(`${API}/audio/listen-and-answer`, {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+            },
+            body: formData,
+        });
+
+        if (!res.ok) {
+            console.error("API Error status:", res.status);
+            return;
+        }
+
+        const data = await res.json();
+        console.log("Transcription:", data.transcript);
+
+        if (data.transcript && data.transcript.trim()) {
+            displayLiveAnswer(data);
+
+            liveSessionHistory.push({
+                question: data.transcript,
+                answer: data.answer
+            });
+            if (liveSessionHistory.length > 10) liveSessionHistory.shift();
+        }
+    } catch (err) {
+        console.error("Fetch error:", err);
+    }
+}
+
+function displayLiveAnswer(data) {
+    const answerArea = document.getElementById("answer-area");
+    const levelDisplay = data.detected_level ? ` • ${data.detected_level.toUpperCase()}` : "";
+
+    document.querySelector(".answer-header .label").textContent = `Your Answer${levelDisplay}`;
+    document.getElementById("answer-text").textContent = data.answer || "No answer generated.";
+    document.getElementById("input-question").value = data.transcript; // Show what was heard
+
+    const codeSection = document.getElementById("code-section");
+    if (data.code) {
+        document.getElementById("code-text").textContent = data.code;
+        document.getElementById("code-lang").textContent = (data.code_language || "CODE").toUpperCase();
+        codeSection.classList.remove("hidden");
+    } else {
+        codeSection.classList.add("hidden");
+    }
+
+    const kpList = document.getElementById("key-points");
+    kpList.innerHTML = "";
+    (data.key_points || []).forEach((point) => {
+        const li = document.createElement("li");
+        li.textContent = point;
+        kpList.appendChild(li);
+    });
+
+    document.getElementById("tip-text").textContent = data.tip || "";
+    answerArea.classList.remove("hidden");
 }
 
 // ── Clipboard helpers ────────────────────────────

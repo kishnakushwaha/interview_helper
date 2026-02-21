@@ -6,13 +6,15 @@
     "scripts": {
         "start": "electron .",
         "dev": "electron . --dev",
-        "build": "electron-builder"
+        "build": "electron-builder",
+        "build:win": "electron-builder --win --x64",
+        "clean-dist": "node clean-dist.js"
     },
     "build": {
         "appId": "com.desier.desktop",
         "productName": "DesierAI",
         "directories": {
-            "output": "dist"
+            "output": "dist/${os}"
         },
         "mac": {
             "category": "public.app-category.productivity",
@@ -20,6 +22,9 @@
                 "dmg",
                 "zip"
             ]
+        },
+        "win": {
+            "target": "nsis"
         },
         "files": [
             "**/*",

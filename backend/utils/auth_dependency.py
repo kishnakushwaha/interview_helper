@@ -45,6 +45,11 @@ def get_current_user(request: Request):
     try:
         token = auth_header.split(" ")[1]
 
+        # ⚠️ TEST INJECTION ⚠️
+        # Allow the mock token from Android testing to bypass Supabase verification
+        if token == "mock-premium-token":
+            return {"sub": "android-tester", "email": "tester@desierai.com"}
+
         # Get the token header to determine algorithm
         unverified_header = jwt.get_unverified_header(token)
         alg = unverified_header.get("alg", "HS256")
