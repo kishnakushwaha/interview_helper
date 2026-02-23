@@ -44,8 +44,19 @@ async def listen_and_answer(
             
         transcript = transcribe_audio(content, file.filename)
         
+        # Whisper Silence Hallucination Filter
+        t_clean = transcript.lower().strip()
+        hallucinations = [
+            "thank you.", "okay.", "bye.", "you.", "yeah.", "yes.", 
+            "thank you", "okay", "bye", "you", "yeah", "yes", "amém.", "amén",
+            "hello.", "hello", "hi.", "hi", "i'm sorry.", "sorry."
+        ]
+        
+        if t_clean in hallucinations or len(t_clean) < 3:
+            transcript = "" # Treat as complete silence to prevent UI overwrite
+            
         if not transcript.strip():
-            return {"transcript": "", "answer": "I couldn't hear anything clearly. Could you repeat?"}
+            return {"transcript": "", "answer": ""}
 
         # 2. Get resume context
         resume_text, _ = get_full_resume_text(user_id)
