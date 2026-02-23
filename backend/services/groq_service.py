@@ -119,7 +119,7 @@ Your absolute only purpose is to provide direct, factual, technical answers to i
 
 Resume:
 \"\"\"
-{resume_context}
+{resume_context[:1000]}
 \"\"\"
 {history_block}
 CURRENT QUESTION/AUDIO FRAGMENT: {question}
@@ -146,7 +146,7 @@ OUTPUT FORMAT (JSON ONLY):
         model=MODEL,
         messages=[{"role": "user", "content": prompt}],
         temperature=0.3, # Low temp for factual consistency
-        max_tokens=2048,
+        max_tokens=512, # Drastically reduced from 2048 to prevent 6k TPM Rate Limit
     )
 
     raw = response.choices[0].message.content.strip()
