@@ -12,7 +12,7 @@ if not GROQ_API_KEY:
     raise Exception("GROQ_API_KEY missing in .env")
 
 client = Groq(api_key=GROQ_API_KEY)
-MODEL = "llama3-8b-8192"
+MODEL = "llama-3.1-8b-instant"
 
 
 def generate_interview_questions(
