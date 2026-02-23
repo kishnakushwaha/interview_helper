@@ -107,8 +107,8 @@ def generate_live_answer(
     history_block = ""
     if history:
         history_block = "\n\n── Interview so far (Most recent first) ──\n"
-        # Use last 20 questions for deep context (Llama-3 has 128k context)
-        for i, turn in enumerate(history[-20:], 1):
+        # Use last 3 questions for brief context to ensure low latency and save tokens
+        for i, turn in enumerate(history[-3:], 1):
             q = turn.get("question", "")
             a = turn.get("answer", "")
             history_block += f"Q{i}: {q}\nA{i}: {a}\n\n"

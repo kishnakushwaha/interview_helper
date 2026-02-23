@@ -5,7 +5,7 @@
  * and display of AI-generated answers.
  */
 
-const API = "http://localhost:8000";
+const API = "https://intervu-vfbb.onrender.com";
 const SUPABASE_URL = "https://uptdcwqxxwesfbzdlbdj.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_iWcbs-0OGigM2j9kbYvSMQ_tKZFZUSZ";
 
@@ -123,12 +123,12 @@ async function askQuestion() {
         const levelDisplay = data.detected_level ? ` • ${data.detected_level.toUpperCase()}` : "";
         document.querySelector(".answer-header .label").textContent = `Your Answer${levelDisplay}`;
         document.getElementById("answer-text").textContent =
-            data.answer || "No answer generated.";
+            (data.answer || "No answer generated.").replace(/\\n/g, '\n');
 
         // Display code block
         const codeSection = document.getElementById("code-section");
         if (data.code) {
-            document.getElementById("code-text").textContent = data.code;
+            document.getElementById("code-text").textContent = data.code.replace(/\\n/g, '\n');
             document.getElementById("code-lang").textContent = (data.code_language || "CODE").toUpperCase();
             codeSection.classList.remove("hidden");
         } else {
