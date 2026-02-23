@@ -117,13 +117,16 @@ app.whenReady().then(() => {
     if (app.dock) app.dock.hide();
 
     createOverlay();
-    createTray();
+    // STEALTH: Top menu bar Tray icon is disabled for perfect invisibility
+    // createTray();
 
     globalShortcut.register("CommandOrControl+Shift+D", toggleOverlay);
+    globalShortcut.register("CommandOrControl+Shift+Q", () => app.quit()); // Secret quit button
 
-    console.log("✅ DesierAI Desktop running (stealth mode)");
+    console.log("✅ DesierAI Desktop running (PERFECT stealth mode)");
     console.log("   Cmd+Shift+D to toggle overlay");
-    console.log("   No dock icon • No app switcher entry");
+    console.log("   Cmd+Shift+Q to FULLY QUIT the app");
+    console.log("   No tray icon • No dock icon • No app switcher entry");
     console.log("   Invisible to screen sharing");
 });
 
