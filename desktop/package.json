@@ -1,6 +1,6 @@
 {
     "name": "desierai-desktop",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "description": "DesierAI – Screen-share-safe interview assistant",
     "main": "main.js",
     "scripts": {

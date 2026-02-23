@@ -53,6 +53,7 @@ async function handleLogin() {
 
         const data = await res.json();
         accessToken = data.access_token;
+        localStorage.setItem("desier_access_token", accessToken);
 
         // Store token in main process
         await window.desierAPI.setToken(accessToken);
@@ -60,12 +61,28 @@ async function handleLogin() {
         // Switch to main view
         document.getElementById("view-login").classList.add("hidden");
         document.getElementById("view-main").classList.remove("hidden");
+        document.getElementById("btn-logout").classList.remove("hidden");
     } catch (err) {
         errorEl.textContent = err.message;
         errorEl.classList.remove("hidden");
     } finally {
         btn.disabled = false;
         btn.textContent = "Login";
+    }
+}
+
+function logout() {
+    accessToken = null;
+    localStorage.removeItem("desier_access_token");
+    window.desierAPI.setToken(null);
+    document.getElementById("view-main").classList.add("hidden");
+    document.getElementById("answer-area").classList.add("hidden");
+    document.getElementById("code-section").classList.add("hidden");
+    document.getElementById("view-login").classList.remove("hidden");
+    document.getElementById("btn-logout").classList.add("hidden");
+
+    if (typeof stopVoiceMode === "function") {
+        stopVoiceMode();
     }
 }
 
@@ -111,9 +128,7 @@ async function askQuestion() {
             // Auto-logout if token expired
             if (res.status === 401 || errText.toLowerCase().includes("expired")) {
                 alert("Your session has expired. Please log in again.");
-                document.getElementById("view-main").classList.add("hidden");
-                document.getElementById("view-login").classList.remove("hidden");
-                accessToken = null;
+                logout();
                 return;
             }
             throw new Error(errText);
@@ -287,10 +302,7 @@ async function processVoiceChunk(blob) {
 
             if (res.status === 401 || errText.toLowerCase().includes("expired")) {
                 alert("Your session has expired. Please log in again.");
-                document.getElementById("view-main").classList.add("hidden");
-                document.getElementById("view-login").classList.remove("hidden");
-                stopVoiceMode();
-                accessToken = null;
+                logout();
                 return;
             }
 
@@ -393,13 +405,24 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // Check if we have a stored token
-    window.desierAPI.getToken().then((token) => {
-        if (token) {
-            accessToken = token;
-            document.getElementById("view-login").classList.add("hidden");
-            document.getElementById("view-main").classList.remove("hidden");
-        }
-    });
+    const storedToken = localStorage.getItem("desier_access_token");
+    if (storedToken) {
+        accessToken = storedToken;
+        window.desierAPI.setToken(storedToken);
+        document.getElementById("view-login").classList.add("hidden");
+        document.getElementById("view-main").classList.remove("hidden");
+        document.getElementById("btn-logout").classList.remove("hidden");
+    } else {
+        window.desierAPI.getToken().then((token) => {
+            if (token) {
+                accessToken = token;
+                localStorage.setItem("desier_access_token", token);
+                document.getElementById("view-login").classList.add("hidden");
+                document.getElementById("view-main").classList.remove("hidden");
+                document.getElementById("btn-logout").classList.remove("hidden");
+            }
+        });
+    }
 
     // ── Focus Management for Stealth ─────────────────
     // Only allow window to take focus when user intends to type.
