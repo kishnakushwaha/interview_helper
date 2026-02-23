@@ -19,6 +19,7 @@ const {
     ipcMain,
     nativeImage,
     screen,
+    shell
 } = require("electron");
 const path = require("path");
 
@@ -150,5 +151,10 @@ ipcMain.handle("set-focusable", (_event, focused) => {
     if (overlayWindow) {
         overlayWindow.setFocusable(focused);
     }
+    return true;
+});
+
+ipcMain.handle("open-external", (_event, url) => {
+    shell.openExternal(url);
     return true;
 });

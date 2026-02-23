@@ -397,6 +397,29 @@ document.addEventListener("keydown", (e) => {
 
 // ── Password field Enter key ─────────────────────
 document.addEventListener("DOMContentLoaded", () => {
+    // Check for updates
+    const CURRENT_VERSION = "1.1.0";
+    let updateUrl = "";
+
+    fetch(`${API}/version`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.latest_desktop_version && data.latest_desktop_version !== CURRENT_VERSION) {
+                document.getElementById("update-text").textContent = data.update_message || "A new version of DesierAI is available!";
+                updateUrl = data.download_url;
+                document.getElementById("update-banner").classList.remove("hidden");
+                // Resize window slightly to accommodate banner
+                window.resizeBy(0, 40);
+            }
+        })
+        .catch(err => console.log("Update check failed", err));
+
+    window.downloadUpdate = function () {
+        if (updateUrl && window.desierAPI.openExternal) {
+            window.desierAPI.openExternal(updateUrl);
+        }
+    };
+
     document.getElementById("login-password").addEventListener("keydown", (e) => {
         if (e.key === "Enter") {
             e.preventDefault();

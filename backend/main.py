@@ -21,3 +21,11 @@ app.include_router(audio.router, prefix="/audio", tags=["Audio"])
 @app.get("/")
 def root():
     return {"message": "DesierAI backend running"}
+
+@app.get("/version")
+def get_version():
+    return {
+        "latest_desktop_version": "1.1.0",
+        "update_message": "A new version of DesierAI is available!",
+        "download_url": "https://github.com/kishnakushwaha/interview_helper"
+    }
