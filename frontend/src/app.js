@@ -2,7 +2,7 @@
    DesierAI – Frontend Application
    ═══════════════════════════════════════════════ */
 
-const API = "http://localhost:8000";
+const API = "https://intervu-vfbb.onrender.com";
 
 // Supabase settings (same as backend .env)
 const SUPABASE_URL = "https://uptdcwqxxwesfbzdlbdj.supabase.co";
