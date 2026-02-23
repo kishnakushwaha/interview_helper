@@ -106,7 +106,17 @@ async function askQuestion() {
 
         if (!res.ok) {
             const err = await res.json();
-            throw new Error(err.detail || "Failed to get answer");
+            const errText = err.detail || "Failed to get answer";
+
+            // Auto-logout if token expired
+            if (res.status === 401 || errText.toLowerCase().includes("expired")) {
+                alert("Your session has expired. Please log in again.");
+                document.getElementById("view-main").classList.add("hidden");
+                document.getElementById("view-login").classList.remove("hidden");
+                accessToken = null;
+                return;
+            }
+            throw new Error(errText);
         }
 
         const data = await res.json();
@@ -269,7 +279,26 @@ async function processVoiceChunk(blob) {
         });
 
         if (!res.ok) {
-            console.error("API Error status:", res.status);
+            let errText = `API Error: ${res.status}`;
+            try {
+                const errData = await res.json();
+                if (errData.detail) errText = errData.detail;
+            } catch (e) { }
+
+            if (res.status === 401 || errText.toLowerCase().includes("expired")) {
+                alert("Your session has expired. Please log in again.");
+                document.getElementById("view-main").classList.add("hidden");
+                document.getElementById("view-login").classList.remove("hidden");
+                stopVoiceMode();
+                accessToken = null;
+                return;
+            }
+
+            console.error(errText);
+            const errEl = document.getElementById("ask-error");
+            errEl.textContent = errText;
+            errEl.classList.remove("hidden");
+            document.getElementById("voice-status").textContent = "🎙️ Mic Active";
             return;
         }
 
