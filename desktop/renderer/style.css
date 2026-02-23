@@ -229,6 +229,14 @@ button {
     animation: fadeIn 0.35s ease 0.15s both;
 }
 
+/* ── Code Display ────────────────────── */
+#code-text {
+    white-space: pre-wrap !important;
+    word-break: break-all;
+    display: block;
+    line-height: 1.6;
+}
+
 .extra-card h4 {
     font-size: 0.72rem;
     margin-bottom: 6px;

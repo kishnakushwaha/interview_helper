@@ -324,12 +324,12 @@ function displayLiveAnswer(data) {
     const levelDisplay = data.detected_level ? ` • ${data.detected_level.toUpperCase()}` : "";
 
     document.querySelector(".answer-header .label").textContent = `Your Answer${levelDisplay}`;
-    document.getElementById("answer-text").textContent = data.answer || "No answer generated.";
+    document.getElementById("answer-text").textContent = (data.answer || "No answer generated.").replace(/\\n/g, '\n');
     document.getElementById("input-question").value = data.transcript; // Show what was heard
 
     const codeSection = document.getElementById("code-section");
     if (data.code) {
-        document.getElementById("code-text").textContent = data.code;
+        document.getElementById("code-text").textContent = data.code.replace(/\\n/g, '\n');
         document.getElementById("code-lang").textContent = (data.code_language || "CODE").toUpperCase();
         codeSection.classList.remove("hidden");
     } else {
