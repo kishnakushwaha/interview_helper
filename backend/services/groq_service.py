@@ -137,7 +137,7 @@ OUTPUT FORMAT (JSON ONLY):
   "answer": "Direct technical answer, no greeting or conversational filler. (Or empty string if hallucination)",
   "key_points": ["Technical point 1", "Technical point 2"],
   "tip": "Short delivery advice",
-  "code": "Code snippet. Ensure you format it across multiple lines using actual \\n newline characters. Do NOT condense into a single line.",
+  "code": "Code snippet. You MUST format this as a single valid JSON string. Escape all internal double quotes as \\\" and escape all actual newlines as \\n. Failure to perfectly escape quotes and newlines will crash the JSON parser.",
   "code_language": "python/js/etc",
   "detected_level": "easy/medium/hard"
 }}"""
